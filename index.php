@@ -1,74 +1,73 @@
 <?php
-
-$conn = new mysqli('localhost', 'root', '', 'tumblrHub');
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+// Database connection
+function dbConnect() {
+    $conn = new mysqli('localhost', 'root', '', 'tumblrHub');
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    return $conn;
 }
 
-$message = "";
-
-// Create Operation: Add a new Tumblr to the database
-if (isset($_POST['create'])) {
-    $tumblrName = $_POST['tumblrName'];
-    $tumblrDescription = $_POST['tumblrDescription'];
-    $quantityAvailable = $_POST['quantityAvailable'];
-    $price = $_POST['price'];
-    $size = $_POST['size'];
-    $material = $_POST['material'];  // Selection
-    $color = $_POST['color'];        // Selection
-    $productAddedBy = "Ipseeka Malla"; // Hardcoded or fetched from session/user input
-
-    // Insert Tumblr into the database with Material and Color
+// Function to create a new Tumblr
+function addTumblr($tumblrName, $tumblrDescription, $quantityAvailable, $price, $size, $material, $color, $productAddedBy) {
+    $conn = dbConnect();
     $sql = "INSERT INTO tumblrs (TumblrName, TumblrDescription, QuantityAvailable, Price, Size, Material, Color, ProductAddedBy) 
             VALUES ('$tumblrName', '$tumblrDescription', $quantityAvailable, $price, '$size', '$material', '$color', '$productAddedBy')";
-    
     if ($conn->query($sql) === TRUE) {
-        $message = "New Tumblr added successfully by $productAddedBy!";
+        return "New Tumblr added successfully by $productAddedBy!";
     } else {
-        $message = "Error: " . $sql . "<br>" . $conn->error;
+        return "Error: " . $sql . "<br>" . $conn->error;
     }
 }
 
-// Update Operation: Update Tumblr details in the database
-if (isset($_POST['update'])) {
-    $tumblrID = $_POST['tumblrID'];
-    $tumblrName = $_POST['tumblrName'];
-    $tumblrDescription = $_POST['tumblrDescription'];
-    $quantityAvailable = $_POST['quantityAvailable'];
-    $price = $_POST['price'];
-    $size = $_POST['size'];
-    $material = $_POST['material'];  // Selection
-    $color = $_POST['color'];        // Selection
-
-    // Update Tumblr in the database with Material and Color
+// Function to update an existing Tumblr
+function updateTumblr($tumblrID, $tumblrName, $tumblrDescription, $quantityAvailable, $price, $size, $material, $color) {
+    $conn = dbConnect();
     $sql = "UPDATE tumblrs SET TumblrName='$tumblrName', TumblrDescription='$tumblrDescription', 
             QuantityAvailable=$quantityAvailable, Price=$price, Size='$size', Material='$material', Color='$color' 
             WHERE TumblrID=$tumblrID";
-
     if ($conn->query($sql) === TRUE) {
-        $message = "Tumblr updated successfully!";
+        return "Tumblr updated successfully!";
     } else {
-        $message = "Error: " . $sql . "<br>" . $conn->error;
+        return "Error: " . $sql . "<br>" . $conn->error;
     }
 }
 
-// Delete Operation: Delete a Tumblr from the database
-if (isset($_POST['delete'])) {
-    $tumblrID = $_POST['tumblrID'];
-
-    // Delete Tumblr from the database
+// Function to delete a Tumblr
+function deleteTumblr($tumblrID) {
+    $conn = dbConnect();
     $sql = "DELETE FROM tumblrs WHERE TumblrID=$tumblrID";
-
     if ($conn->query($sql) === TRUE) {
-        $message = "Tumblr deleted successfully!";
+        return "Tumblr deleted successfully!";
     } else {
-        $message = "Error: " . $sql . "<br>" . $conn->error;
+        return "Error: " . $sql . "<br>" . $conn->error;
     }
 }
 
-// Read Operation: Fetch all Tumblrs from the database
-$sql = "SELECT * FROM tumblrs";
-$result = $conn->query($sql);
+// Function to fetch all tumblrs
+function fetchTumblrs() {
+    $conn = dbConnect();
+    $sql = "SELECT * FROM tumblrs";
+    $result = $conn->query($sql);
+    return $result;
+}
+
+$message = "";
+$productAddedBy = "Ipseeka Malla"; // Hardcoded for this example
+
+// Handling form submissions
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if (isset($_POST['create'])) {
+        $message = addTumblr($_POST['tumblrName'], $_POST['tumblrDescription'], $_POST['quantityAvailable'], $_POST['price'], $_POST['size'], $_POST['material'], $_POST['color'], $productAddedBy);
+    } elseif (isset($_POST['update'])) {
+        $message = updateTumblr($_POST['tumblrID'], $_POST['tumblrName'], $_POST['tumblrDescription'], $_POST['quantityAvailable'], $_POST['price'], $_POST['size'], $_POST['material'], $_POST['color']);
+    } elseif (isset($_POST['delete'])) {
+        $message = deleteTumblr($_POST['tumblrID']);
+    }
+}
+
+// Fetch all tumblrs for display
+$tumblrs = fetchTumblrs();
 ?>
 
 <!DOCTYPE html>
@@ -105,15 +104,14 @@ $result = $conn->query($sql);
 
     <div class="container mt-5">
         <h3>Hello Admin,</h3>
-       
         <p class="text-success text-center"><?php echo $message; ?></p>
 
         <!-- READ AND DELETE SECTION (Available Tumblrs) -->
         <h2 id="availableTumblrs" class="text-center my-4">Discover Our Available Tumblrs</h2>
         <div class="list-group">
             <?php
-            if ($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()) {
+            if ($tumblrs->num_rows > 0) {
+                while($row = $tumblrs->fetch_assoc()) {
                     echo '<div class="list-group-item">';
                     echo '<h5 class="mb-1">' . $row["TumblrName"] . '</h5>';
                     echo '<p class="mb-1">' . $row["TumblrDescription"] . '</p>';
@@ -122,7 +120,7 @@ $result = $conn->query($sql);
                     echo '<p><strong>Size:</strong> ' . $row["Size"] . '</p>';
                     echo '<p><strong>Material:</strong> ' . $row["Material"] . '</p>';
                     echo '<p><strong>Color:</strong> ' . $row["Color"] . '</p>';
-                    echo '<p><strong>Added By:</strong> ' . $row["ProductAddedBy"] . '</p>';  // Display who added the Tumblr
+                    echo '<p><strong>Added By:</strong> ' . $row["ProductAddedBy"] . '</p>';
                     echo '<div class="d-flex justify-content-between align-items-center">';
                     echo '<button class="btn btn-success btn-sm edit" onclick="populateForm(' . $row["TumblrID"] . ', \'' . addslashes($row["TumblrName"]) . '\', \'' . addslashes($row["TumblrDescription"]) . '\', ' . $row["QuantityAvailable"] . ', ' . $row["Price"] . ', \'' . addslashes($row["Size"]) . '\', \'' . addslashes($row["Material"]) . '\', \'' . addslashes($row["Color"]) . '\')"><a href="#addTumblr">Edit</a></button>';
                     echo '<form method="post" action="" style="display:inline;">
