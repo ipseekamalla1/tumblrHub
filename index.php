@@ -14,11 +14,13 @@ if (isset($_POST['create'])) {
     $quantityAvailable = $_POST['quantityAvailable'];
     $price = $_POST['price'];
     $size = $_POST['size'];
+    $material = $_POST['material'];  // Selection
+    $color = $_POST['color'];        // Selection
     $productAddedBy = "Ipseeka Malla"; // Hardcoded or fetched from session/user input
 
-    // Insert Tumblr into the database with ProductAddedBy
-    $sql = "INSERT INTO tumblrs (TumblrName, TumblrDescription, QuantityAvailable, Price, Size, ProductAddedBy) 
-            VALUES ('$tumblrName', '$tumblrDescription', $quantityAvailable, $price, '$size', '$productAddedBy')";
+    // Insert Tumblr into the database with Material and Color
+    $sql = "INSERT INTO tumblrs (TumblrName, TumblrDescription, QuantityAvailable, Price, Size, Material, Color, ProductAddedBy) 
+            VALUES ('$tumblrName', '$tumblrDescription', $quantityAvailable, $price, '$size', '$material', '$color', '$productAddedBy')";
     
     if ($conn->query($sql) === TRUE) {
         $message = "New Tumblr added successfully by $productAddedBy!";
@@ -35,10 +37,13 @@ if (isset($_POST['update'])) {
     $quantityAvailable = $_POST['quantityAvailable'];
     $price = $_POST['price'];
     $size = $_POST['size'];
+    $material = $_POST['material'];  // Selection
+    $color = $_POST['color'];        // Selection
 
-    // Update Tumblr in the database
+    // Update Tumblr in the database with Material and Color
     $sql = "UPDATE tumblrs SET TumblrName='$tumblrName', TumblrDescription='$tumblrDescription', 
-            QuantityAvailable=$quantityAvailable, Price=$price, Size='$size' WHERE TumblrID=$tumblrID";
+            QuantityAvailable=$quantityAvailable, Price=$price, Size='$size', Material='$material', Color='$color' 
+            WHERE TumblrID=$tumblrID";
 
     if ($conn->query($sql) === TRUE) {
         $message = "Tumblr updated successfully!";
@@ -115,9 +120,11 @@ $result = $conn->query($sql);
                     echo '<p><strong>Quantity:</strong> ' . $row["QuantityAvailable"] . '</p>';
                     echo '<p><strong>Price:</strong> $' . $row["Price"] . '</p>';
                     echo '<p><strong>Size:</strong> ' . $row["Size"] . '</p>';
+                    echo '<p><strong>Material:</strong> ' . $row["Material"] . '</p>';
+                    echo '<p><strong>Color:</strong> ' . $row["Color"] . '</p>';
                     echo '<p><strong>Added By:</strong> ' . $row["ProductAddedBy"] . '</p>';  // Display who added the Tumblr
                     echo '<div class="d-flex justify-content-between align-items-center">';
-                    echo '<button class="btn btn-success btn-sm edit" onclick="populateForm(' . $row["TumblrID"] . ', \'' . addslashes($row["TumblrName"]) . '\', \'' . addslashes($row["TumblrDescription"]) . '\', ' . $row["QuantityAvailable"] . ', ' . $row["Price"] . ', \'' . addslashes($row["Size"]) . '\')"><a href="#addTumblr">Edit</a></button>';
+                    echo '<button class="btn btn-success btn-sm edit" onclick="populateForm(' . $row["TumblrID"] . ', \'' . addslashes($row["TumblrName"]) . '\', \'' . addslashes($row["TumblrDescription"]) . '\', ' . $row["QuantityAvailable"] . ', ' . $row["Price"] . ', \'' . addslashes($row["Size"]) . '\', \'' . addslashes($row["Material"]) . '\', \'' . addslashes($row["Color"]) . '\')"><a href="#addTumblr">Edit</a></button>';
                     echo '<form method="post" action="" style="display:inline;">
                             <input type="hidden" name="tumblrID" value="' . $row["TumblrID"] . '">
                             <button type="submit" name="delete" class="btn btn-danger btn-sm">Delete</button>
@@ -163,34 +170,51 @@ $result = $conn->query($sql);
                     <input type="text" name="size" id="size" class="form-control" required>
                 </div>
 
+                <div class="form-group">
+                    <label for="material">Material:</label>
+                    <select name="material" id="material" class="form-control" required>
+                        <option value="" disabled selected>Select Material</option>
+                        <option value="Plastic">Plastic</option>
+                        <option value="Glass">Glass</option>
+                        <option value="Ceramic">Ceramic</option>
+                        <option value="Metal">Metal</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="color">Color:</label>
+                    <select name="color" id="color" class="form-control" required>
+                        <option value="" disabled selected>Select Color</option>
+                        <option value="Red">Red</option>
+                        <option value="Blue">Blue</option>
+                        <option value="Green">Green</option>
+                        <option value="Yellow">Yellow</option>
+                        <option value="Black">Black</option>
+                        <option value="White">White</option>
+                    </select>
+                </div>
+
                 <button type="submit" name="create" class="btn btn-primary btn-block">Add Tumblr</button>
                 <button type="submit" name="update" class="btn btn-warning btn-block">Update Tumblr</button>
             </form>
         </div>
     </div>
 
-    <footer class="footer text-center">
-        <div class="container">
-            <p>&copy; 2024 TumblrHub. All Rights Reserved.</p>
-            <p>Contact: <a href="mailto:info@tumblrhub.com">info@tumblrhub.com</a></p>
-            <p>Follow us on 
-                <a href="#" target="_blank">Facebook</a>, 
-                <a href="#" target="_blank">Twitter</a>, 
-                <a href="#" target="_blank">Instagram</a>
-            </p>
-        </div>
-    </footer>
-
     <script>
-        // Function to populate the form for editing
-        function populateForm(tumblrID, tumblrName, tumblrDescription, quantityAvailable, price, size) {
+        function populateForm(tumblrID, tumblrName, tumblrDescription, quantityAvailable, price, size, material, color) {
             document.getElementById('tumblrID').value = tumblrID;
             document.getElementById('tumblrName').value = tumblrName;
             document.getElementById('tumblrDescription').value = tumblrDescription;
             document.getElementById('quantityAvailable').value = quantityAvailable;
             document.getElementById('price').value = price;
             document.getElementById('size').value = size;
+            document.getElementById('material').value = material;  // Set the material
+            document.getElementById('color').value = color;        // Set the color
         }
     </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
