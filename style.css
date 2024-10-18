@@ -1,0 +1,153 @@
+body {
+    background-color: #A6D8EB; /* Soft sky blue background for the body */
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+}
+
+/* Header styling */
+.header {
+    text-align: center; /* Center the header text */
+    text-decoration: underline;
+    text-decoration-color: #FF6B6B; /* Coral for the underline */
+    margin: 20px 0; /* Margin for spacing */
+    color: #1A73E8; /* Rich blue for header text */
+}
+
+/* Navbar styling */
+.navbar {
+    background-color: #1A73E8; /* Dark blue navbar background */
+    height: 10vh;
+}
+
+/* Style for the hoodie container */
+.hoodie {
+    margin: 20px auto; /* Center hoodie container */
+    background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white background */
+    border-radius: 20px;
+    width: 80%; /* Adjusted width for responsiveness */
+    height: auto; /* Automatic height */
+    padding: 20px; /* Padding for content */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    transition: transform 0.3s ease; /* Animation on hover */
+}
+
+/* Hover effect on hoodie container */
+.hoodie:hover {
+    transform: scale(1.02); /* Slight zoom effect */
+}
+
+/* Headings in the hoodie */
+.hoodie h2 {
+    margin: 30px 0; /* Spacing above and below */
+    color: #1A73E8; /* Rich blue for headings */
+}
+
+/* Form styling */
+.hoodie form {
+    margin: 30px 0; /* Margin for spacing */
+}
+
+/* Footer styling */
+.footer {
+    background-color: #1A73E8; /* Dark blue footer background */
+    color: white; /* White text color */
+    padding: 20px 0; /* Padding for top and bottom */
+    position: relative; /* Ensures footer is positioned properly */
+    width: 100%; /* Full width */
+    margin-top: 30px;
+    text-align: center; /* Center the footer content */
+}
+
+/* Style for footer links */
+.footer a {
+    color: white; /* Link color */
+    text-decoration: none; /* Remove underline */
+}
+
+.footer a:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+/* Hero section */
+.hero {
+    width: 100%; /* Full width */
+    height: 240px; /* Fixed height */
+    background-color: #FFE6E6; /* Light coral background */
+    display: flex; /* Use flexbox for centering */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+}
+
+.hero h1 {
+    font-size: 30px; /* Font size */
+    color: #1A73E8; /* Rich blue for hero text */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Subtle text shadow for depth */
+}
+
+/* List group for hoodies */
+.list-group {
+    padding: 0; /* Remove default padding */
+}
+
+/* List group items */
+.list-group-item {
+    background-color: #FFE6E6; /* Light coral background for items */
+    margin: 10px 0; /* Margin for spacing between items */
+    border-radius: 10px; /* Rounded corners */
+    padding: 15px; /* Padding for content */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Animation for hover */
+    position: relative; /* Position for pseudo-element */
+}
+
+/* Hover effect for list items */
+.list-group-item:hover {
+    background-color: #FF6B6B; /* Coral hover color */
+    transform: translateY(-2px); /* Slight lift on hover */
+}
+
+/* Button styles */
+.btn {
+    background-color: #FF6B6B; /* Coral for buttons */
+    color: black; /* Button text color */
+    border: none; /* Remove default border */
+    border-radius: 20px; /* Rounded corners */
+    padding: 10px 20px; /* Padding for buttons */
+    margin: 5px; /* Margin for spacing */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Animation for hover */
+}
+
+/* Hover effect for buttons */
+.btn:hover {
+    background-color: #E55A5A; /* Darker coral shade on hover */
+    transform: translateY(-2px); /* Slight lift on hover */
+}
+
+/* Edit and Delete button styles */
+.btn-edit {
+    background-color: #A6D8EB; /* Soft sky blue for edit button */
+}
+
+.btn-delete {
+    background-color: #FF4D4D; /* Red background for delete button */
+}
+
+.btn-edit:hover, .btn-delete:hover {
+    opacity: 0.9; /* Slight opacity change on hover */
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+    .hoodie {
+        width: 90%; /* Adjust width for mobile */
+    }
+
+    .hero h1 {
+        font-size: 24px; /* Smaller font size for mobile */
+    }
+}
+
+.edit a {
+    color: black;
+}
