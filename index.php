@@ -113,6 +113,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $message = addTumblr($_POST['tumblrName'], $_POST['tumblrDescription'], $_POST['quantityAvailable'], $_POST['price'], $_POST['size'], $_POST['material'], $_POST['color'], $productAddedBy);
     } elseif (isset($_POST['update'])) {
         $message = updateTumblr($_POST['tumblrID'], $_POST['tumblrName'], $_POST['tumblrDescription'], $_POST['quantityAvailable'], $_POST['price'], $_POST['size'], $_POST['material'], $_POST['color']);
+        // After update, reset the form fields
+        header("Location: index.php");
+        exit();
     } elseif (isset($_POST['delete'])) {
         $message = deleteTumblr($_POST['tumblrID']);
     }
