@@ -60,6 +60,10 @@ function addTumblr($tumblrName, $tumblrDescription, $quantityAvailable, $price, 
 
 // Function to update an existing Tumblr
 function updateTumblr($tumblrID, $tumblrName, $tumblrDescription, $quantityAvailable, $price, $size, $material, $color) {
+    if (!isUserLoggedIn()) {
+        return "You must be logged in to edit this Tumblr.";
+    }
+
     $conn = dbConnect();
     $sql = "UPDATE tumblrs SET TumblrName='$tumblrName', TumblrDescription='$tumblrDescription', 
             QuantityAvailable=$quantityAvailable, Price=$price, Size='$size', Material='$material', Color='$color' 
@@ -73,6 +77,10 @@ function updateTumblr($tumblrID, $tumblrName, $tumblrDescription, $quantityAvail
 
 // Function to delete a Tumblr
 function deleteTumblr($tumblrID) {
+    if (!isUserLoggedIn()) {
+        return "You must be logged in to delete this Tumblr.";
+    }
+
     $conn = dbConnect();
     $sql = "DELETE FROM tumblrs WHERE TumblrID=$tumblrID";
     if ($conn->query($sql) === TRUE) {
@@ -95,7 +103,7 @@ $message = "";
 $loginMessage = "";
 $productAddedBy = isUserLoggedIn() ? $_SESSION['username'] : "Unknown";
 
-// Handle form submissions for login
+// Handling form submissions for login
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (isset($_POST['login'])) {
         $loginMessage = login($_POST['username'], $_POST['password']);
@@ -112,6 +120,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 // Fetch all tumblrs for display
 $tumblrs = fetchTumblrs();
+
+// If an ID is passed to edit, fetch that Tumblr's data for editing
+if (isset($_GET['tumblrID'])) {
+    $tumblrID = $_GET['tumblrID'];
+    $conn = dbConnect();
+    $sql = "SELECT * FROM tumblrs WHERE TumblrID = $tumblrID";
+    $result = $conn->query($sql);
+    $tumblrToEdit = $result->fetch_assoc();
+}
 ?>
 
 <!DOCTYPE html>
@@ -194,17 +211,20 @@ $tumblrs = fetchTumblrs();
                 echo '<p><strong>Color:</strong> ' . $row["Color"] . '</p>';
                 echo '<p><strong>Added By:</strong> ' . $row["ProductAddedBy"] . '</p>';
 
-                // Edit Button: Populate the form with existing Tumblr data
-                echo '<form method="post" action="" style="display:inline;">
-                        <input type="hidden" name="tumblrID" value="' . $row["TumblrID"] . '">
-                        <button type="submit" name="update" class="btn btn-warning btn-sm">Edit</button>
-                      </form>';
+                // Only show Edit and Delete buttons if the user is logged in
+                if (isUserLoggedIn()) {
+                    // Edit Button
+                    echo '<form method="get" action="" style="display:inline;">
+                            <input type="hidden" name="tumblrID" value="' . $row["TumblrID"] . '">
+                            <button type="submit" class="btn btn-warning btn-sm">Edit</button>
+                          </form>';
 
-                // Delete Button
-                echo '<form method="post" action="" style="display:inline;">
-                        <input type="hidden" name="tumblrID" value="' . $row["TumblrID"] . '">
-                        <button type="submit" name="delete" class="btn btn-danger btn-sm">Delete</button>
-                      </form>';
+                    // Delete Button
+                    echo '<form method="post" action="" style="display:inline;">
+                            <input type="hidden" name="tumblrID" value="' . $row["TumblrID"] . '">
+                            <button type="submit" name="delete" class="btn btn-danger btn-sm">Delete</button>
+                          </form>';
+                }
                 echo '</div>';
             }
         } else {
@@ -215,62 +235,65 @@ $tumblrs = fetchTumblrs();
 
     <hr>
 
-    <!-- Add Tumblr Section (Restricted to logged-in users) -->
+    <!-- Add or Update Tumblr Section (Restricted to logged-in users) -->
     <?php if (isUserLoggedIn()): ?>
         <div class="tumblr">
-            <h2 id="addTumblr" class="text-center my-4">Add or Edit Tumblr</h2>
+            <h2 id="addTumblr" class="text-center my-4"><?php echo isset($tumblrToEdit) ? 'Edit Tumblr' : 'Add Tumblr'; ?></h2>
             <form method="post" action="">
-                <input type="hidden" name="tumblrID" id="tumblrID"> <!-- Hidden field for Tumblr ID -->
+                <input type="hidden" name="tumblrID" id="tumblrID" value="<?php echo isset($tumblrToEdit) ? $tumblrToEdit['TumblrID'] : ''; ?>"> <!-- Hidden field for Tumblr ID -->
+                
                 <div class="form-group">
                     <label for="tumblrName">Tumblr Name:</label>
-                    <input type="text" name="tumblrName" id="tumblrName" class="form-control" required>
+                    <input type="text" name="tumblrName" id="tumblrName" class="form-control" value="<?php echo isset($tumblrToEdit) ? $tumblrToEdit['TumblrName'] : ''; ?>" required>
                 </div>
 
                 <div class="form-group">
                     <label for="tumblrDescription">Tumblr Description:</label>
-                    <textarea name="tumblrDescription" id="tumblrDescription" class="form-control" required></textarea>
+                    <textarea name="tumblrDescription" id="tumblrDescription" class="form-control" required><?php echo isset($tumblrToEdit) ? $tumblrToEdit['TumblrDescription'] : ''; ?></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="quantityAvailable">Quantity Available:</label>
-                    <input type="number" name="quantityAvailable" id="quantityAvailable" class="form-control" required>
+                    <input type="number" name="quantityAvailable" id="quantityAvailable" class="form-control" value="<?php echo isset($tumblrToEdit) ? $tumblrToEdit['QuantityAvailable'] : ''; ?>" required>
                 </div>
 
                 <div class="form-group">
                     <label for="price">Price:</label>
-                    <input type="text" name="price" id="price" class="form-control" required>
+                    <input type="text" name="price" id="price" class="form-control" value="<?php echo isset($tumblrToEdit) ? $tumblrToEdit['Price'] : ''; ?>" required>
                 </div>
 
                 <div class="form-group">
                     <label for="size">Size:</label>
-                    <input type="text" name="size" id="size" class="form-control" required>
+                    <input type="text" name="size" id="size" class="form-control" value="<?php echo isset($tumblrToEdit) ? $tumblrToEdit['Size'] : ''; ?>" required>
                 </div>
 
                 <div class="form-group">
                     <label for="material">Material:</label>
                     <select name="material" id="material" class="form-control" required>
-                        <option value="" disabled selected>Select Material</option>
-                        <option value="Plastic">Plastic</option>
-                        <option value="Glass">Glass</option>
-                        <option value="Ceramic">Ceramic</option>
-                        <option value="Metal">Metal</option>
+                        <option value="Plastic" <?php echo (isset($tumblrToEdit) && $tumblrToEdit['Material'] === 'Plastic') ? 'selected' : ''; ?>>Plastic</option>
+                        <option value="Glass" <?php echo (isset($tumblrToEdit) && $tumblrToEdit['Material'] === 'Glass') ? 'selected' : ''; ?>>Glass</option>
+                        <option value="Ceramic" <?php echo (isset($tumblrToEdit) && $tumblrToEdit['Material'] === 'Ceramic') ? 'selected' : ''; ?>>Ceramic</option>
+                        <option value="Metal" <?php echo (isset($tumblrToEdit) && $tumblrToEdit['Material'] === 'Metal') ? 'selected' : ''; ?>>Metal</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="color">Color:</label>
                     <select name="color" id="color" class="form-control" required>
-                        <option value="" disabled selected>Select Color</option>
-                        <option value="Red">Red</option>
-                        <option value="Blue">Blue</option>
-                        <option value="Green">Green</option>
-                        <option value="Yellow">Yellow</option>
-                        <option value="Black">Black</option>
-                        <option value="White">White</option>
+                        <option value="Red" <?php echo (isset($tumblrToEdit) && $tumblrToEdit['Color'] === 'Red') ? 'selected' : ''; ?>>Red</option>
+                        <option value="Blue" <?php echo (isset($tumblrToEdit) && $tumblrToEdit['Color'] === 'Blue') ? 'selected' : ''; ?>>Blue</option>
+                        <option value="Green" <?php echo (isset($tumblrToEdit) && $tumblrToEdit['Color'] === 'Green') ? 'selected' : ''; ?>>Green</option>
+                        <option value="Yellow" <?php echo (isset($tumblrToEdit) && $tumblrToEdit['Color'] === 'Yellow') ? 'selected' : ''; ?>>Yellow</option>
+                        <option value="Black" <?php echo (isset($tumblrToEdit) && $tumblrToEdit['Color'] === 'Black') ? 'selected' : ''; ?>>Black</option>
+                        <option value="White" <?php echo (isset($tumblrToEdit) && $tumblrToEdit['Color'] === 'White') ? 'selected' : ''; ?>>White</option>
                     </select>
                 </div>
 
-                <button type="submit" name="create" class="btn btn-primary btn-block">Add/Update Tumblr</button>
+                <?php if (isset($tumblrToEdit)): ?>
+                    <button type="submit" name="update" class="btn btn-primary btn-block">Update Tumblr</button>
+                <?php else: ?>
+                    <button type="submit" name="create" class="btn btn-primary btn-block">Add Tumblr</button>
+                <?php endif; ?>
             </form>
         </div>
     <?php endif; ?>
