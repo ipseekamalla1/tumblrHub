@@ -15,6 +15,7 @@ function isUserLoggedIn() {
     return isset($_SESSION['username']);
 }
 
+//made login function
 // Handle login
 function login($username, $password) {
     $conn = dbConnect();
@@ -35,14 +36,16 @@ function login($username, $password) {
     }
 }
 
-// Logout function
+
+// made functions for easy accesss
+// made Logout function
 function logout() {
     session_destroy();
     header("Location: index.php");
     exit();
 }
 
-// Function to create a new Tumblr (Restricted to logged-in users)
+//  created Function to create a new Tumblr (Restricted to logged-in users)
 function addTumblr($tumblrName, $tumblrDescription, $quantityAvailable, $price, $size, $material, $color, $productAddedBy) {
     if (!isUserLoggedIn()) {
         return "Please login to add a Tumblr.";
@@ -75,7 +78,7 @@ function updateTumblr($tumblrID, $tumblrName, $tumblrDescription, $quantityAvail
     }
 }
 
-// Function to delete a Tumblr
+//  created Function to delete a Tumblr
 function deleteTumblr($tumblrID) {
     if (!isUserLoggedIn()) {
         return "You must be logged in to delete this Tumblr.";
@@ -217,7 +220,7 @@ if (isset($_GET['tumblrID'])) {
                 // Only show Edit and Delete buttons if the user is logged in
                 if (isUserLoggedIn()) {
                     // Edit Button
-                    echo '<form method="get" action="" style="display:inline;">
+                    echo '<form method="get" action="" style="display:inline; href="#addTumblr">
                             <input type="hidden" name="tumblrID" value="' . $row["TumblrID"] . '">
                             <button type="submit" class="btn btn-warning btn-sm">Edit</button>
                           </form>';
